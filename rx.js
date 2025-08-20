@@ -86,8 +86,20 @@ async function onChannelMessageReceived(message) {
 
     // Replace with your channel ID
     const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
+    let meshmondaychanel = null
+    if (process.env.DISCORD_CHANNEL_ID_MESHMONDAY) {
+        meshmondaychanel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID_MESHMONDAY);
+    }
+
 
     if (channel) {
+        if (message.text.toLowerCase().includes("#meshmonday".toLowerCase())) {
+            console.log("Mesh Monday message received, ignoring.");
+            if (meshmondaychanel !== null) {
+                await meshmondaychanel.send(message.text);
+
+            }
+        }
         await channel.send(message.text);
         await channel.send(JSON.stringify(message))
     } else {
