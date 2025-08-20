@@ -8,6 +8,8 @@ Create a .env file and add your discord bot token
 Example ENV code
 ```
 DISCORD_TOKEN=EXAMPLETOKEN
+DISCORD_CHANNEL_ID=
+SERIAL_PORT=/dev/
 ```
 
 

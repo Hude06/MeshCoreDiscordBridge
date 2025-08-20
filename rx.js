@@ -5,7 +5,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import dotenv from "dotenv";
 dotenv.config();
 // serial connections are supported by "companion_radio_usb" firmware
-const connection = new NodeJSSerialConnection("/dev/tty.usbmodem1401");
+const connection = new NodeJSSerialConnection(process.env.SERIAL_PORT || "/dev/ttyUSB0");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,            // For server-related events
@@ -85,7 +85,7 @@ async function onChannelMessageReceived(message) {
     console.log(`Received channel message: ${message.text}`);
 
     // Replace with your channel ID
-    const channel = client.channels.cache.get("1310482258217664533");
+    const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
 
     if (channel) {
         await channel.send(message.text);
