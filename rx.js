@@ -6,18 +6,31 @@ import dotenv from "dotenv";
 dotenv.config();
 // serial connections are supported by "companion_radio_usb" firmware
 const connection = new NodeJSSerialConnection(process.env.SERIAL_PORT || "/dev/ttyUSB0");
-const client = new Client({
+const bot1 = new Client({
   intents: [
     GatewayIntentBits.Guilds,            // For server-related events
     GatewayIntentBits.GuildMessages,     // For message events in servers
     GatewayIntentBits.MessageContent     // To read message content
   ]
 });
-client.once("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+if (process.env.DISCORDBOT_TOKEN2) {
+    const bot2 = new Client({
+        intents: [
+            GatewayIntentBits.Guilds,            // For server-related events
+            GatewayIntentBits.GuildMessages,     // For message events in servers
+            GatewayIntentBits.MessageContent     // To read message content
+        ]
+    });
+    bot2.login(process.env.DISCORDBOT_TOKEN2);
+    bot2.once("ready", () => {
+        console.log(`Logged in as ${bot2.user.tag}!`);
+    });
+}
+bot1.once("ready", () => {
+  console.log(`Logged in as ${bot1.user.tag}!`);
 });
 
-client.login(process.env.DISCORD_TOKEN);
+bot1.login(process.env.DISCORD_TOKEN);
 console.log("Connecting to meshcore device...");
 // wait until connected
 connection.on("connected", async () => {
@@ -25,20 +38,10 @@ connection.on("connected", async () => {
     // we are now connected
     console.log("connected!");
 
-    // log contacts
-    const channel = await connection.findChannelByName("Public");
-    if(!channel){
-
-        console.log("Channel not found");
-
-        await connection.close();
-
-        return;
-
-    }
     console.log("Sending Message");
-    client.on("messageCreate", async (message) => {
-    if (message.author.bot) return;
+    bot1.on("messageCreate", async (message) => {
+        if (message.author.bot) return;
+        const userId = message.author.id; 
 
     if (message.content.startsWith("!send")) {
         const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
@@ -48,12 +51,28 @@ connection.on("connected", async () => {
         } else {
         message.reply(content);
         console.log(`Sending message to meshcore: ${content}`);
-        await connection.sendChannelTextMessage(0, content);
-        
-
+        await connection.sendChannelTextMessage(0, userId + " " + content);
         }
     }
     });
+    if (process.env.DISCORDBOT_TOKEN2) {
+        bot2.on("messageCreate", async (message) => {
+            if (message.author.bot) return;
+            const userId = message.author.id;
+
+            if (message.content.startsWith("!send")) {
+                const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
+
+                if (content.length === 0) {
+                    message.reply("You need to tell me what to send!");
+                } else {
+                    message.reply(content);
+                    console.log(`Sending message to meshcore: ${content}`);
+                    await connection.sendChannelTextMessage(0, userId + " " + content);
+                }
+            }
+        });
+    }
 
 });
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
@@ -85,10 +104,10 @@ async function onChannelMessageReceived(message) {
     console.log(`Received channel message: ${message.text}`);
 
     // Replace with your channel ID
-    const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
+    const channel = bot1.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
     let meshmondaychanel = null
     if (process.env.DISCORD_CHANNEL_ID_MESHMONDAY) {
-        meshmondaychanel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID_MESHMONDAY);
+        meshmondaychanel = bot1.channels.cache.get(process.env.DISCORD_CHANNEL_ID_MESHMONDAY);
     }
 
 
@@ -101,7 +120,9 @@ async function onChannelMessageReceived(message) {
             }
         }
         await channel.send(message.text);
-        await channel.send(JSON.stringify(message))
+        if (process.env.DEBUG) {
+            await channel.send(JSON.stringify(message))
+        }
     } else {
         console.log("Channel not found!");
     }

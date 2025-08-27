@@ -20,6 +20,13 @@ Then run the node using ``` node rx.py ```make sure your chanel is correct in th
 
 Feel free to open Issues or ping me in the Meshcore Discord
 
+### Running 2 Bots at the same time
+```
+DISCORDBOT_TOKEN2=
+DISCORD_CHANNEL_ID2=
+DISCORD_CHANNEL_ID_MESHMONDAY2=
+```
+You just need to make a second discord bot and do the exact same things you did before and put all the info in here
 
 ## MeshMonday
 - Meshmonday every monday everyone tries to send out messages with #meshmonday the script will then send them to a specific chanel. Add the chanel id to the ENV to enable meshmonday DISCORD_CHANNEL_ID_MESHMONDAY = chanel ID
