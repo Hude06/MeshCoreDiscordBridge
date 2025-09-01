@@ -41,7 +41,7 @@ connection.on("connected", async () => {
     console.log("Sending Message");
     bot1.on("messageCreate", async (message) => {
         if (message.author.bot) return;
-        const userId = message.author.id; 
+        const userId = message.author.username; 
 
     if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
         const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
@@ -58,7 +58,7 @@ connection.on("connected", async () => {
     if (process.env.DISCORDBOT_TOKEN2) {
         bot2.on("messageCreate", async (message) => {
             if (message.author.bot) return;
-            const userId = message.author.id;
+            const userId = message.author.username;
 
             if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID2) {
                 const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
