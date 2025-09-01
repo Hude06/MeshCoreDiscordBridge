@@ -26,11 +26,11 @@ if (process.env.DISCORDBOT_TOKEN2) {
         console.log(`Logged in as ${bot2.user.tag}!`);
     });
 }
+bot1.login(process.env.DISCORD_TOKEN);
 bot1.once("ready", () => {
   console.log(`Logged in as ${bot1.user.tag}!`);
 });
 
-bot1.login(process.env.DISCORD_TOKEN);
 console.log("Connecting to meshcore device...");
 // wait until connected
 connection.on("connected", async () => {
@@ -43,7 +43,7 @@ connection.on("connected", async () => {
         if (message.author.bot) return;
         const userId = message.author.id; 
 
-    if (message.content.startsWith("!send")) {
+    if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
         const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
 
         if (content.length === 0) {
@@ -60,7 +60,7 @@ connection.on("connected", async () => {
             if (message.author.bot) return;
             const userId = message.author.id;
 
-            if (message.content.startsWith("!send")) {
+            if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID2) {
                 const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
 
                 if (content.length === 0) {
@@ -120,7 +120,7 @@ async function onChannelMessageReceived(message) {
             }
         }
         await channel.send(message.text);
-        if (process.env.DEBUG) {
+        if (process.env.DEBUG === true) {
             await channel.send(JSON.stringify(message))
         }
     } else {
