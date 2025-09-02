@@ -42,7 +42,10 @@ connection.on("connected", async () => {
     bot1.on("messageCreate", async (message) => {
         if (message.author.bot) return;
         const userId = message.author.username; 
-
+        if (message.content.startsWith("!advert") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
+            await connection.sendFloodAdvert();
+            message.reply("Sending Flood Advert");
+    }
     if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
         const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
 
