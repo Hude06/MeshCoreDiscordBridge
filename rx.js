@@ -44,6 +44,7 @@ connection.on("connected", async () => {
         const userId = message.author.username; 
         if (message.content.startsWith("!advert") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
             await connection.sendFloodAdvert();
+            console.log("Flooding")
             message.reply("Sending Flood Advert");
     }
     if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
