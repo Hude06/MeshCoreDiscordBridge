@@ -55,7 +55,7 @@ connection.on("connected", async () => {
         } else {
         message.reply(content);
         console.log(`Sending message to meshcore: ${content}`);
-        await connection.sendChannelTextMessage(0, userId + " " + content);
+        await connection.sendChannelTextMessage(0, userId + ": " + content);
         }
     }
     });
@@ -72,7 +72,7 @@ connection.on("connected", async () => {
                 } else {
                     message.reply(content);
                     console.log(`Sending message to meshcore: ${content}`);
-                    await connection.sendChannelTextMessage(0, userId + " " + content);
+                    await connection.sendChannelTextMessage(0, userId + ": " + content);
                 }
             }
         });
