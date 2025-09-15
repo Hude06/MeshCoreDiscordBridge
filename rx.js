@@ -41,23 +41,39 @@ connection.on("connected", async () => {
     console.log("Sending Message");
     bot1.on("messageCreate", async (message) => {
         if (message.author.bot) return;
-        const userId = message.author.username; 
-        if (message.content.startsWith("!advert") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
-            await connection.sendFloodAdvert();
-            console.log("Flooding")
-            message.reply("Sending Flood Advert");
-    }
-    if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
-        const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
-
-        if (content.length === 0) {
-        message.reply("You need to tell me what to send!");
-        } else {
-        message.reply(content);
-        console.log(`Sending message to meshcore: ${content}`);
-        await connection.sendChannelTextMessage(0, userId + ": " + content);
+            const userId = message.author.username; 
+            if (message.content.startsWith("!advert") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
+                await connection.sendFloodAdvert();
+                console.log("Flooding")
+                message.reply("Sending Flood Advert");
         }
-    }
+        if (message.content.startsWith("!login") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
+            const content = message.content.slice(6).trim(); // remove "!send" and trim spaces
+            if (content.length === 0) {
+                message.reply("Please send a valid repeater name");
+            } else {
+                const contact = await connection.findContactByName(content);
+                if (!contact) {
+                    message.reply("Could not find repeater");
+                }
+                if (contact) {
+                    await connection.login(contact.publicKey, "hello");
+                    const status = await connection.getStatus(contact.publicKey);
+                    message.reply(status);
+                }
+            }
+        }
+        if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
+            const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
+
+            if (content.length === 0) {
+            message.reply("You need to tell me what to send!");
+            } else {
+            message.reply(content);
+            console.log(`Sending message to meshcore: ${content}`);
+            await connection.sendChannelTextMessage(0, userId + ": " + content);
+            }
+        }
     });
     if (process.env.DISCORDBOT_TOKEN2) {
         bot2.on("messageCreate", async (message) => {
@@ -116,6 +132,9 @@ async function onChannelMessageReceived(message) {
 
 
     if (channel) {
+        if (message.text.toLowerCase().includes("ping")) {
+            await connection.sendChannelTextMessage(0, "pong");
+        }
         if (message.text.toLowerCase().includes("#meshmonday".toLowerCase())) {
             console.log("Mesh Monday message received, ignoring.");
             if (meshmondaychanel !== null) {
