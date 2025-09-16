@@ -69,6 +69,14 @@ connection.on("connected", async () => {
                         console.log(status)
                         message.reply(JSON.stringify(status));
                     } catch(error) {
+                        try {
+                            await connection.login(contact.publicKey, "");
+
+                        } catch(error) {
+                            console.log(error)
+                            message.reply(error)
+                        }
+
                         message.reply(error)
                         console.log(error)
                     }
