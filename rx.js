@@ -52,14 +52,25 @@ connection.on("connected", async () => {
             if (content.length === 0) {
                 message.reply("Please send a valid repeater name");
             } else {
-                const contact = await connection.findContactByName(content);
+                let contact;
+                try {
+                    contact = await connection.findContactByName(content);
+                } catch(error){
+                    console.log(error)
+
+                }
                 if (!contact) {
                     message.reply("Could not find repeater");
                 }
                 if (contact) {
-                    await connection.login(contact.publicKey, "hello");
-                    const status = await connection.getStatus(contact.publicKey);
-                    message.reply(status);
+                    try {
+                        await connection.login(contact.publicKey, "hello");
+                        const status = await connection.getStatus(contact.publicKey);
+                        console.log(status)
+                        message.reply(JSON.stringify(status));
+                    } catch(error) {
+                        console.log(error)
+                    }
                 }
             }
         }
