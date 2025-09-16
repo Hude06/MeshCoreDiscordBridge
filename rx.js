@@ -69,6 +69,7 @@ connection.on("connected", async () => {
                         console.log(status)
                         message.reply(JSON.stringify(status));
                     } catch(error) {
+                        message.reply(error)
                         console.log(error)
                     }
                 }
