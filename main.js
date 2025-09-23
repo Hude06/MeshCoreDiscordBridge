@@ -137,8 +137,11 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
         console.log(e);
 
     }
-
 });
+connection.on(Constants.PushCodes.AdvertReceived, (advert) => {
+    console.log("Advert received event", advert);
+
+})
 
 async function onChannelMessageReceived(message) {
     console.log(`Received channel message: ${message.text}`);
