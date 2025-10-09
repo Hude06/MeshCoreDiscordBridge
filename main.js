@@ -66,7 +66,7 @@ async function onChannelMessageReceived(message) {
   if (message.text.includes("#meshmonday")) {
     meshMonday.send(message.text);
   }
-  if (message.text.includes("ping").toLowerCase()) {
+  if (message.text.toLowerCase().includes("ping")) {
     await connection.sendChannelTextMessage(0, "pong");
   }
   const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
