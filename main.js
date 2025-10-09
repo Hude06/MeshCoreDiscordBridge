@@ -63,10 +63,10 @@ connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Adver
 async function onChannelMessageReceived(message) {
   console.log(`Received channel message: ${message.text}`);
   const meshMonday = bot.channels.cache.get(config.DISCORD_CHANNEL_ID_MESHMONDAY)
-  if (message.text.include("#meshmonday")) {
+  if (message.text.includes("#meshmonday")) {
     meshMonday.send(message.text);
   }
-  if (message.text.include("ping")) {
+  if (message.text.includes("ping")) {
     await connection.sendChannelTextMessage(0, "pong");
   }
   const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
