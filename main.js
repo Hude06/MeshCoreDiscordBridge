@@ -51,10 +51,15 @@ connection.on("connected", async () => console.log("Connected to meshcore!"));
 function bytesToHex(uint8Array) {
     return Array.from(uint8Array).map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
+let lastRssi = null;
+let lastSnr = null;
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
     // console.log("LogRxData", event)
     // console.log(bytesToHex(event.raw));
+    lastRssi = event.lastRssi;
+    lastSnr = event.lastSnr;
     console.log("SNR AND RSSI",event.lastSnr, event.lastRssi);
+
 });
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
@@ -76,7 +81,7 @@ async function onChannelMessageReceived(message) {
   }
   if (message.text.toLowerCase().includes("ping")) {
 
-    await connection.sendChannelTextMessage(0, "pong");
+    await connection.sendChannelTextMessage(0, "pong" + (lastRssi ? ` (RSSI: ${lastRssi} dBm` : "") + (lastSnr ? `, SNR: ${lastSnr} dB)` : ")"));
   }
   const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
   if (channel) await channel.send(message.text);
