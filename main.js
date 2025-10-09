@@ -48,6 +48,10 @@ bot.on("interactionCreate", async (interaction) => {
 
 console.log("Connecting to meshcore device...");
 connection.on("connected", async () => console.log("Connected to meshcore!"));
+connection.on(Constants.PushCodes.LogRxData, async (event) => {
+    console.log("LogRxData", event)
+    console.log(this.bytesToHex(event.raw));
+});
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
     const waitingMessages = await connection.getWaitingMessages();
@@ -67,6 +71,7 @@ async function onChannelMessageReceived(message) {
     meshMonday.send(message.text);
   }
   if (message.text.toLowerCase().includes("ping")) {
+
     await connection.sendChannelTextMessage(0, "pong");
   }
   const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
