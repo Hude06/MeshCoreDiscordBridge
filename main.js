@@ -52,9 +52,9 @@ function bytesToHex(uint8Array) {
     return Array.from(uint8Array).map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
-    console.log("LogRxData", event)
-    console.log(bytesToHex(event.raw));
-    console.log(event.lastSnr)
+    // console.log("LogRxData", event)
+    // console.log(bytesToHex(event.raw));
+    console.log("SNR AND RSSI",event.lastSnr, event.lastRssi);
 });
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
