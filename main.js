@@ -48,9 +48,12 @@ bot.on("interactionCreate", async (interaction) => {
 
 console.log("Connecting to meshcore device...");
 connection.on("connected", async () => console.log("Connected to meshcore!"));
+function bytesToHex(uint8Array) {
+    return Array.from(uint8Array).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
     console.log("LogRxData", event)
-    console.log(this.bytesToHex(event.raw));
+    console.log(bytesToHex(event.raw));
 });
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
