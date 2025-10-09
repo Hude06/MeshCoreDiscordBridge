@@ -53,7 +53,8 @@ function bytesToHex(uint8Array) {
 }
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
     console.log("LogRxData", event)
-    console.log(bytesToHex(event.raw).LogRxData.lastSnr);
+    console.log(bytesToHex(event.raw));
+    console.log(event.lastSnr)
 });
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
