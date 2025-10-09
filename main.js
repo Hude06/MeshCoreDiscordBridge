@@ -4,7 +4,6 @@ import fs from "fs";
 
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 const connection = new NodeJSSerialConnection(config.SERIAL_PORT || "/dev/ttyUSB0");
-
 const bot = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
@@ -15,12 +14,6 @@ bot.once("ready", async () => {
   // Register slash commands for this guild
   const commands = [
     new SlashCommandBuilder().setName('advert').setDescription('Send a flood advert'),
-    new SlashCommandBuilder()
-      .setName('login')
-      .setDescription('Login to a repeater')
-      .addStringOption(option =>
-        option.setName('repeater').setDescription('Name of the repeater').setRequired(true)
-      ),
     new SlashCommandBuilder()
       .setName('send')
       .setDescription('Send a message to meshcore')
@@ -43,21 +36,6 @@ bot.on("interactionCreate", async (interaction) => {
   if (commandName === "advert") {
     await connection.sendFloodAdvert();
     await interaction.reply("Sending Flood Advert!");
-  }
-
-  if (commandName === "login") {
-    const repeater = interaction.options.getString("repeater");
-    try {
-      const contact = await connection.findContactByName(repeater);
-      if (!contact) return interaction.reply("Could not find repeater");
-
-      await connection.login(contact.publicKey, "hello");
-      const status = await connection.getStatus(contact.publicKey);
-      await interaction.reply(`Status: ${JSON.stringify(status)}`);
-    } catch (error) {
-      console.error(error);
-      await interaction.reply(`Error logging in: ${error}`);
-    }
   }
 
   if (commandName === "send") {
@@ -84,6 +62,13 @@ connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Adver
 
 async function onChannelMessageReceived(message) {
   console.log(`Received channel message: ${message.text}`);
+  const meshMonday = bot.channels.cache.get(config.DISCORD_CHANNEL_ID_MESHMONDAY)
+  if (message.text.include("#meshmonday")) {
+    meshMonday.send(message.text);
+  }
+  if (message.text.include("ping")) {
+    await connection.sendChannelTextMessage(0, "pong");
+  }
   const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
   if (channel) await channel.send(message.text);
 }
