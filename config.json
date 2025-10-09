@@ -1,0 +1,9 @@
+{
+  "identifier": "!",
+  "DISCORD_TOKEN": "EXAMPLE_TOKEN",
+  "DISCORD_CHANNEL_ID": "123456789012345678",
+  "SERIAL_PORT": "/dev/ttyUSB0",
+  "chanels": {
+
+  }
+}

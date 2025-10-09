@@ -1,178 +1,92 @@
+import { NodeJSSerialConnection, Constants } from "@liamcottle/meshcore.js";
+import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } from "discord.js";
+import fs from "fs";
 
+const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+const connection = new NodeJSSerialConnection(config.SERIAL_PORT || "/dev/ttyUSB0");
 
-import { TCPConnection, NodeJSSerialConnection, Constants } from "@liamcottle/meshcore.js";
-import { Client, GatewayIntentBits } from "discord.js";
-import dotenv from "dotenv";
-dotenv.config();
-// serial connections are supported by "companion_radio_usb" firmware
-const connection = new NodeJSSerialConnection(process.env.SERIAL_PORT || "/dev/ttyUSB0");
-const bot1 = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,            // For server-related events
-    GatewayIntentBits.GuildMessages,     // For message events in servers
-    GatewayIntentBits.MessageContent     // To read message content
-  ]
+const bot = new Client({
+  intents: [GatewayIntentBits.Guilds],
 });
-if (process.env.DISCORDBOT_TOKEN2) {
-    const bot2 = new Client({
-        intents: [
-            GatewayIntentBits.Guilds,            // For server-related events
-            GatewayIntentBits.GuildMessages,     // For message events in servers
-            GatewayIntentBits.MessageContent     // To read message content
-        ]
-    });
-    bot2.login(process.env.DISCORDBOT_TOKEN2);
-    bot2.once("ready", () => {
-        console.log(`Logged in as ${bot2.user.tag}!`);
-    });
-}
-bot1.login(process.env.DISCORD_TOKEN);
-bot1.once("ready", () => {
-  console.log(`Logged in as ${bot1.user.tag}!`);
+
+bot.once("ready", async () => {
+  console.log(`Logged in as ${bot.user.tag}!`);
+
+  // Register slash commands for this guild
+  const commands = [
+    new SlashCommandBuilder().setName('advert').setDescription('Send a flood advert'),
+    new SlashCommandBuilder()
+      .setName('login')
+      .setDescription('Login to a repeater')
+      .addStringOption(option =>
+        option.setName('repeater').setDescription('Name of the repeater').setRequired(true)
+      ),
+    new SlashCommandBuilder()
+      .setName('send')
+      .setDescription('Send a message to meshcore')
+      .addStringOption(option =>
+        option.setName('message').setDescription('Message to send').setRequired(true)
+      )
+  ].map(cmd => cmd.toJSON());
+
+  const rest = new REST({ version: '10' }).setToken(config.DISCORD_TOKEN);
+  await rest.put(Routes.applicationGuildCommands(bot.user.id, config.GUILD_ID), { body: commands });
+
+  console.log("Slash commands registered!");
+});
+
+bot.on("interactionCreate", async (interaction) => {
+  if (!interaction.isCommand()) return;
+
+  const { commandName } = interaction;
+
+  if (commandName === "advert") {
+    await connection.sendFloodAdvert();
+    await interaction.reply("Sending Flood Advert!");
+  }
+
+  if (commandName === "login") {
+    const repeater = interaction.options.getString("repeater");
+    try {
+      const contact = await connection.findContactByName(repeater);
+      if (!contact) return interaction.reply("Could not find repeater");
+
+      await connection.login(contact.publicKey, "hello");
+      const status = await connection.getStatus(contact.publicKey);
+      await interaction.reply(`Status: ${JSON.stringify(status)}`);
+    } catch (error) {
+      console.error(error);
+      await interaction.reply(`Error logging in: ${error}`);
+    }
+  }
+
+  if (commandName === "send") {
+    const message = interaction.options.getString("message");
+    const userId = interaction.user.username;
+    await connection.sendChannelTextMessage(0, `${userId}: ${message}`);
+    await interaction.reply(`Sent: ${message}`);
+  }
 });
 
 console.log("Connecting to meshcore device...");
-// wait until connected
-connection.on("connected", async () => {
-
-    // we are now connected
-    console.log("connected!");
-
-    console.log("Sending Message");
-    bot1.on("messageCreate", async (message) => {
-        if (message.author.bot) return;
-            const userId = message.author.username; 
-            if (message.content.startsWith("!advert") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
-                await connection.sendFloodAdvert();
-                console.log("Flooding")
-                message.reply("Sending Flood Advert");
-        }
-        if (message.content.startsWith("!login") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
-            const content = message.content.slice(6).trim(); // remove "!send" and trim spaces
-            if (content.length === 0) {
-                message.reply("Please send a valid repeater name");
-            } else {
-                let contact;
-                try {
-                    contact = await connection.findContactByName(content);
-                } catch(error){
-                    console.log(error)
-
-                }
-                if (!contact) {
-                    message.reply("Could not find repeater");
-                }
-                if (contact) {
-                    try {
-                        await connection.login(contact.publicKey, "hello");
-                        const status = await connection.getStatus(contact.publicKey);
-                        console.log(status)
-                        message.reply(JSON.stringify(status));
-                    } catch(error) {
-                        try {
-                            await connection.login(contact.publicKey, "");
-
-                        } catch(error) {
-                            console.log(error)
-                            message.reply(error)
-                        }
-
-                        message.reply(error)
-                        console.log(error)
-                    }
-                }
-            }
-        }
-        if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID) {
-            const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
-
-            if (content.length === 0) {
-            message.reply("You need to tell me what to send!");
-            } else {
-            message.reply(content);
-            console.log(`Sending message to meshcore: ${content}`);
-            await connection.sendChannelTextMessage(0, userId + ": " + content);
-            }
-        }
-    });
-    if (process.env.DISCORDBOT_TOKEN2) {
-        bot2.on("messageCreate", async (message) => {
-            if (message.author.bot) return;
-            const userId = message.author.username;
-
-            if (message.content.startsWith("!send") && message.channel.id === process.env.DISCORD_CHANNEL_ID2) {
-                const content = message.content.slice(5).trim(); // remove "!send" and trim spaces
-
-                if (content.length === 0) {
-                    message.reply("You need to tell me what to send!");
-                } else {
-                    message.reply(content);
-                    console.log(`Sending message to meshcore: ${content}`);
-                    await connection.sendChannelTextMessage(0, userId + ": " + content);
-                }
-            }
-        });
-    }
-
-});
+connection.on("connected", async () => console.log("Connected to meshcore!"));
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
-    console.log("Message waiting event received");
-
-    try {
-
-        const waitingMessages = await connection.getWaitingMessages();
-
-        for(const message of waitingMessages){
-
-            if(message.channelMessage) {
-
-                await onChannelMessageReceived(message.channelMessage);
-
-            }
-
-        }
-
-    } catch(e) {
-
-        console.log(e);
-
+  try {
+    const waitingMessages = await connection.getWaitingMessages();
+    for (const msg of waitingMessages) {
+      if (msg.channelMessage) await onChannelMessageReceived(msg.channelMessage);
     }
+  } catch (e) {
+    console.log(e);
+  }
 });
-connection.on(Constants.PushCodes.AdvertReceived, (advert) => {
-    console.log("Advert received event", advert);
-
-})
+connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Advert received:", advert));
 
 async function onChannelMessageReceived(message) {
-    console.log(`Received channel message: ${message.text}`);
-
-    // Replace with your channel ID
-    const channel = bot1.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
-    let meshmondaychanel = null
-    if (process.env.DISCORD_CHANNEL_ID_MESHMONDAY) {
-        meshmondaychanel = bot1.channels.cache.get(process.env.DISCORD_CHANNEL_ID_MESHMONDAY);
-    }
-
-
-    if (channel) {
-        if (message.text.toLowerCase().includes("ping")) {
-            await connection.sendChannelTextMessage(0, "pong");
-        }
-        if (message.text.toLowerCase().includes("#meshmonday".toLowerCase())) {
-            console.log("Mesh Monday message received, ignoring.");
-            if (meshmondaychanel !== null) {
-                await meshmondaychanel.send(message.text);
-
-            }
-        }
-        await channel.send(message.text);
-        if (process.env.DEBUG === true) {
-            await channel.send(JSON.stringify(message))
-        }
-    } else {
-        console.log("Channel not found!");
-    }
+  console.log(`Received channel message: ${message.text}`);
+  const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
+  if (channel) await channel.send(message.text);
 }
 
-// connect to meshcore device
 await connection.connect();
+bot.login(config.DISCORD_TOKEN);
