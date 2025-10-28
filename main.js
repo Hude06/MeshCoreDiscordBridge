@@ -50,6 +50,8 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
       // console.log(((json.path[i]).toString()).length, (contactPrefix).length);
       if (json.path[i].toString() === contactPrefix) {
         console.log("Matched contact:", contact.advName);
+      } else {
+        console.log("No match for contact:", contact.advName, "with path part:", json.path[i].toString(), "and contact prefix:", contactPrefix);
       }
     }
   }
