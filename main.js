@@ -45,7 +45,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     const hex = Buffer.from(contact.publicKey).toString('hex');
     // console.log("Contact hex:", hex.slice(0,2));
     const contactPrefix = hex.slice(0, 2);
-    console.log(json.path,contactPrefix,hex)
+    console.log(json.path,contactPrefix,hex,json)
     for (let i = 0; i < json.path.length; i++) {
       // console.log(((json.path[i]).toString()).length, (contactPrefix).length);
       if (json.path[i].toString() === contactPrefix) {
