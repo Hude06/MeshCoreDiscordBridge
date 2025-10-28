@@ -29,6 +29,11 @@ let lastSnr = null;
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
   console.log("LogRxData", event);
   console.log(bytesToHex(event.raw));
+
+  const bytes = Buffer.from(bytesToHex(event.raw), "hex");
+
+  const packet = Packet.fromBytes(bytes);
+  console.log("Parsed packet:", packet);
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
   console.log("SNR AND RSSI", event.lastSnr, event.lastRssi);
@@ -38,10 +43,7 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
     const waitingMessages = await connection.getWaitingMessages();
     for (const msg of waitingMessages) {
-      console.log("Received message: TEST", msg.waitingMessages);
-      const bytes = Buffer.from("0200B401DF6528CC9778A56F36FE9399A5CF6B0C7EDE", "hex");
-
-      const packet = Packet.fromBytes(bytes);
+      console.log("Received message: TEST", msg);
       if (msg.channelMessage) await onChannelMessageReceived(msg.channelMessage);
     }
   } catch (e) {
