@@ -34,15 +34,17 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
 
   const packet = Packet.fromBytes(bytes);
   const json = (packet);
-  console.log("Parsed packet:", json.path);
+  // console.log("Parsed packet:", json.path);
   const contacts = await connection.getContacts();
 
   for (const contact of contacts) {
-    console.log("Contact:", contact,contact.publicKey);
+    // console.log("Contact:", contact,contact.publicKey);
     // const base64 = Buffer.from(contact.publickey).toString('base64');
     // console.log(base64);
     const hex = Buffer.from(contact.publicKey).toString('hex');
     console.log("Contact hex:", hex.slice(0,2));
+    const contactPrefix = hex.slice(0, 2);
+    console.log(json.path,contactPrefix)
   }
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
