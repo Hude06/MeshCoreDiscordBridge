@@ -48,7 +48,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     for (let i = 0; i < json.path.length; i++) {
       // console.log(typeof(json.path[i]), typeof(contactPrefix));
       if (json.path[i].toString() === contactPrefix) {
-        console.log("Matched contact:", contact.name);
+        console.log("Matched contact:", contact);
       }
     }
   }
