@@ -1,4 +1,5 @@
 import { NodeJSSerialConnection, Constants } from "@liamcottle/meshcore.js";
+import Packet from "@liamcottle/meshcore.js/src/packet.js";
 import { Client, GatewayIntentBits } from "discord.js";
 import fs from "fs";
 
@@ -37,7 +38,10 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
     const waitingMessages = await connection.getWaitingMessages();
     for (const msg of waitingMessages) {
-      console.log(msg.waitingMessages)
+      console.log("Received message: TEST", msg.waitingMessages);
+      const bytes = Buffer.from("0200B401DF6528CC9778A56F36FE9399A5CF6B0C7EDE", "hex");
+
+      const packet = Packet.fromBytes(bytes);
       if (msg.channelMessage) await onChannelMessageReceived(msg.channelMessage);
     }
   } catch (e) {
