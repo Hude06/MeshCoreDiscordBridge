@@ -45,6 +45,11 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     console.log("Contact hex:", hex.slice(0,2));
     const contactPrefix = hex.slice(0, 2);
     console.log(json.path,contactPrefix)
+    for (let i = 0; i < json.path.length; i++) {
+      if (json.path[i] === contactPrefix) {
+        console.log("Matched contact:", contact.name);
+      }
+    }
   }
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
