@@ -41,6 +41,8 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     console.log("Contact:", contact,contact.publicKey);
     // const base64 = Buffer.from(contact.publickey).toString('base64');
     // console.log(base64);
+    const hex = Buffer.from(contact.publicKey).toString('hex');
+    console.log("Contact hex:", hex);
   }
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
