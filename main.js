@@ -47,8 +47,8 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     const contactPrefix = hex.slice(0, 2);
     // console.log(json.path,contactPrefix,hex,json)
     for (let i = 0; i < json.path.length; i++) {
-      console.log("PATH IS ",json.path[i])
-        console.log("prefix is",bytesToHex(new Uint8Array([json.path[i]])));
+      // console.log("PATH IS ",json.path[i])
+        // console.log("prefix is",bytesToHex(new Uint8Array([json.path[i]])));
       if (bytesToHex(new Uint8Array([json.path[i]])) === contactPrefix) {
         console.log("Matched contact:", contact.advName);
       } else {
