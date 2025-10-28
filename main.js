@@ -27,14 +27,15 @@ let lastRssi = null;
 let lastSnr = null;
 
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
-  console.log("LogRxData", event);
-  console.log(bytesToHex(event.raw));
+  // console.log("LogRxData", event);
+  // console.log(bytesToHex(event.raw));
 
   const bytes = Buffer.from(bytesToHex(event.raw), "hex");
 
   const packet = Packet.fromBytes(bytes);
   const json = (packet);
   console.log("Parsed packet:", json.path);
+  console.log("Contacts are ", await connection.getContacts());
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
   console.log("SNR AND RSSI", event.lastSnr, event.lastRssi);
@@ -44,7 +45,7 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
     const waitingMessages = await connection.getWaitingMessages();
     for (const msg of waitingMessages) {
-      console.log("Received message: TEST", msg);
+      // console.log("Received message: TEST", msg);
       if (msg.channelMessage) await onChannelMessageReceived(msg.channelMessage);
     }
   } catch (e) {
@@ -52,10 +53,10 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
   }
 });
 
-connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Advert received:", advert));
+// connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Advert received:", advert));
 
 async function onChannelMessageReceived(message) {
-  console.log(`Received channel message: ${message.text}`);
+  // console.log(`Received channel message: ${message.text}`);
   const meshMonday = bot.channels.cache.get(config.DISCORD_CHANNEL_ID_MESHMONDAY);
   if (message.text.includes("#meshmonday")) {
     if (meshMonday) meshMonday.send(message.text).catch(console.error);
