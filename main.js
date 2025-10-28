@@ -41,13 +41,13 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     // console.log("Contact:", contact,contact.publicKey);
     // const base64 = Buffer.from(contact.publickey).toString('base64');
     // console.log(base64);
-    console.log("Contact advName:", contact.advName);
+    // console.log("Contact advName:", contact.advName);
     const hex = Buffer.from(contact.publicKey).toString('hex');
     // console.log("Contact hex:", hex.slice(0,2));
     const contactPrefix = hex.slice(0, 2);
     // console.log(json.path,contactPrefix)
     for (let i = 0; i < json.path.length; i++) {
-      // console.log((json.path[i]).toString(), (contactPrefix));
+      console.log(((json.path[i]).toString()).length, (contactPrefix).length);
       if (json.path[i].toString() === contactPrefix) {
         console.log("Matched contact:", contact.advName);
       }
