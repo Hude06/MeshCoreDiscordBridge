@@ -35,7 +35,11 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const packet = Packet.fromBytes(bytes);
   const json = (packet);
   console.log("Parsed packet:", json.path);
-  console.log("Contacts are ", await connection.getContacts());
+  const contacts = await connection.getContacts();
+
+  for (const contact of contacts) {
+    console.log("Contact:", contact);
+  }
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
   console.log("SNR AND RSSI", event.lastSnr, event.lastRssi);
