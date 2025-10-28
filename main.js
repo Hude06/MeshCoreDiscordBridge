@@ -33,7 +33,8 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const bytes = Buffer.from(bytesToHex(event.raw), "hex");
 
   const packet = Packet.fromBytes(bytes);
-  console.log("Parsed packet:", packet);
+  const json = packet.toJSON();
+  console.log("Parsed packet:", json.path);
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
   console.log("SNR AND RSSI", event.lastSnr, event.lastRssi);
