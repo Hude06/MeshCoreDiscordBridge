@@ -46,12 +46,10 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     // console.log("Contact hex:", hex.slice(0,2));
     const contactPrefix = hex.slice(0, 2);
     console.log(json.path,contactPrefix,hex,json)
-    var string = new TextDecoder().decode(json.path);
-    console.log("Decoded path string:", string);
 
     for (let i = 0; i < json.path.length; i++) {
       // console.log(((json.path[i]).toString()).length, (contactPrefix).length);
-      if (json.path[i].toString() === contactPrefix) {
+      if (bytesToHex(json.path[i]).toString() === contactPrefix) {
         // console.log("Matched contact:", contact.advName);
       } else {
         // console.log("No match for contact:", contact.advName, "with path part:", json.path[i].toString(), "and contact prefix:", contactPrefix);
