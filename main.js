@@ -38,9 +38,9 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const contacts = await connection.getContacts();
 
   for (const contact of contacts) {
-    console.log("Contact:", contact.publickey);
-    const base64 = Buffer.from(contact.publickey).toString('base64');
-    console.log(base64);
+    console.log("Contact:", contact,contact.publicKey);
+    // const base64 = Buffer.from(contact.publickey).toString('base64');
+    // console.log(base64);
   }
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
