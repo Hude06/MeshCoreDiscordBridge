@@ -38,7 +38,11 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const contacts = await connection.getContacts();
 
   for (const contact of contacts) {
-    console.log("Contact:", contact);
+    console.log("Contact:", contact.publickey);
+    const hex = Array.from(contact.publickey)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+      console.log(hex);
   }
   lastRssi = event.lastRssi;
   lastSnr = event.lastSnr;
