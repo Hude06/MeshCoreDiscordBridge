@@ -35,7 +35,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const packet = Packet.fromBytes(bytes);
   const json = (packet);
 
-  console.log("Parsed packet:", json.path);
+  console.log("Parsed packet:", json);
 
     // console.log(json.path,contactPrefix,hex,json)
   const path = [];
