@@ -54,6 +54,7 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
     const waitingMessages = await connection.getWaitingMessages();
     for (const msg of waitingMessages) {
       // console.log("Received message: TEST", msg);
+      console.log("Received message:", msg);
       if (msg.channelMessage) await onChannelMessageReceived(msg.channelMessage);
     }
   } catch (e) {
