@@ -39,7 +39,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
 
     // console.log(json.path,contactPrefix,hex,json)
   const path = [];
-  console.log(json.payload_type_string)
+  // console.log(json.payload_type_string)
   if (json.payload_type_string === "GRP_TXT") {
     for (let i = 0; i < json.path.length; i++) {
       // const byte = parseInt(json.path[i], 16);
