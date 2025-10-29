@@ -39,6 +39,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     // console.log(json.path,contactPrefix,hex,json)
   for (let i = 0; i < json.path.length; i++) {
     // const byte = parseInt(json.path[i], 16);
+    console.log(json.path[i]);
     const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
     console.log(contact);
   }
