@@ -46,8 +46,9 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
       console.log(json.path[i]);
       const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
       // console.log("Contact is ",contact.advName);
-      path.push(contact.advName || json.path[i]);
-
+      if (contact) {
+        path.push(contact.advName || json.path[i]);
+      }
       if (i == json.path.length - 1) {
         console.log("path is", path,await connection.getWaitingMessages());
 
