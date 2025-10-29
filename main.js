@@ -40,13 +40,18 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     // console.log(json.path,contactPrefix,hex,json)
   const path = [];
   console.log(json.payload_type_string)
-  for (let i = 0; i < json.path.length; i++) {
-    // const byte = parseInt(json.path[i], 16);
-    console.log(json.path[i]);
-    const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
-    // console.log("Contact is ",contact.advName);
-    path.push(contact.advName || json.path[i]);
-    console.log("Path so far:",path);
+  if (json.payload_type_string === "GRP_TXT") {
+    for (let i = 0; i < json.path.length; i++) {
+      // const byte = parseInt(json.path[i], 16);
+      console.log(json.path[i]);
+      const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
+      // console.log("Contact is ",contact.advName);
+      path.push(contact.advName || json.path[i]);
+
+      if (i == json.path.length - 1) {
+        console.log("path is", path);
+      }
+    }
   }
 });
 
