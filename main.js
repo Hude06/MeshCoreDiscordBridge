@@ -33,29 +33,28 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
 
   console.log("Parsed packet:", json);
 
-  if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
-    // Make a stable copy of the Uint8Array
-    const pathCopy = Array.from(json.path);
-    const contactNames = [];
+if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
+  const pathCopy = Array.from(json.path); // stable array of numbers
+  const contactNames = [];
 
-    for (let i = 0; i < pathCopy.length; i++) {
-      const byte = pathCopy[i];
+  for (let i = 0; i < pathCopy.length; i++) {
+    const byte = pathCopy[i]; // stable copy
 
-      // Lookup contact by prefix
-      const contact = await connection.findContactByPublicKeyPrefix([byte]);
+    // call async function with stable number or Uint8Array
+    const contact = await connection.findContactByPublicKeyPrefix(new Uint8Array([byte]));
 
-      if (contact) {
-        contactNames.push(contact.advName);
-      } else {
-        // Push placeholder for unknown contact
-        contactNames.push(`unknown:${byte.toString(16).padStart(2, '0')}`);
-      }
-
-      console.log(`Step ${i}: byte=${byte} contact=${contact?.advName}`);
+    if (contact) {
+      contactNames.push(contact.advName);
+    } else {
+      contactNames.push(`unknown:${byte.toString(16).padStart(2,'0')}`);
     }
 
-    console.log("FINAL PATH:", contactNames);
+    console.log(`Step ${i}: byte=${byte} contact=${contact?.advName}`);
   }
+
+  console.log("FINAL PATH:", contactNames);
+}
+
 });
 
 
