@@ -48,6 +48,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
       // console.log("Contact is ",contact.advName);
       if (contact) {
         path.push(contact.advName || json.path[i]);
+        console.log("path so far", path);
       }
       if (i == json.path.length - 1) {
         console.log("path is", path,await connection.getWaitingMessages());
