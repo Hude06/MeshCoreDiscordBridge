@@ -37,11 +37,14 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   // console.log("Parsed packet:", json.path);
 
     // console.log(json.path,contactPrefix,hex,json)
+  const path = [];
   for (let i = 0; i < json.path.length; i++) {
     // const byte = parseInt(json.path[i], 16);
     console.log(json.path[i]);
     const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
-    console.log("Contact is ",contact);
+    // console.log("Contact is ",contact.advName);
+    path.push(contact.advName || json.path[i]);
+    console.log("Path so far:",path);
   }
 });
 
