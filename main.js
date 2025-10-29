@@ -35,30 +35,13 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const packet = Packet.fromBytes(bytes);
   const json = (packet);
   // console.log("Parsed packet:", json.path);
-  const contacts = await connection.getContacts();
 
-  for (const contact of contacts) {
-    // console.log("Contact:", contact,contact.publicKey);
-    // const base64 = Buffer.from(contact.publickey).toString('base64');
-    // console.log(base64);
-    // console.log("Contact advName:", contact.advName);
-    const hex = Buffer.from(contact.publicKey).toString('hex');
-    // console.log("Contact hex:", hex.slice(0,2));
-    const contactPrefix = hex.slice(0, 2);
     // console.log(json.path,contactPrefix,hex,json)
-    for (let i = 0; i < json.path.length; i++) {
-      // console.log("PATH IS ",json.path[i])
-        // console.log("prefix is",bytesToHex(new Uint8Array([json.path[i]])));
-      if (bytesToHex(new Uint8Array([json.path[i]])) === contactPrefix) {
-        console.log("Matched contact:", contact.advName);
-      } else {
-        // console.log("No match for contact:", contact.advName, "with path part:", json.path[i].toString(), "and contact prefix:", contactPrefix);
-      }
-    }
+  for (let i = 0; i < json.path.length; i++) {
+    // const byte = parseInt(json.path[i], 16);
+    const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
+    console.log(contact);
   }
-  lastRssi = event.lastRssi;
-  lastSnr = event.lastSnr;
-  console.log("SNR AND RSSI", event.lastSnr, event.lastRssi);
 });
 
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
@@ -82,9 +65,7 @@ async function onChannelMessageReceived(message) {
     if (meshMonday) meshMonday.send(message.text).catch(console.error);
   }
   if (message.text.toLowerCase().includes("ping")) {
-    const rssiPart = lastRssi ? ` (RSSI: ${lastRssi} dBm` : "";
-    const snrPart = lastSnr ? `, SNR: ${lastSnr} dB)` : ")";
-    await connection.sendChannelTextMessage(0, "pong" + (rssiPart || snrPart ? `${rssiPart}${snrPart}` : ")"));
+    await connection.sendChannelTextMessage(0, "pong");
   }
   const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
   if (channel) await channel.send(message.text).catch(console.error);
@@ -103,7 +84,7 @@ bot.on("messageCreate", async (message) => {
     if (!message.guild) return;
 
     // only handle messages starting with '!'
-    if (!message.content.startsWith('!')) return;
+    if (!message.content.startsWith(config.identifier)) return;
 
     const args = message.content.slice(1).trim().split(/\s+/);
     const command = args.shift().toLowerCase();
@@ -118,7 +99,6 @@ bot.on("messageCreate", async (message) => {
       }
       return;
     }
-
     if (command === 'send') {
       const text = args.join(' ');
       if (!text) {
