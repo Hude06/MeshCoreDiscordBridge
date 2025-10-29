@@ -43,7 +43,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   if (json.payload_type_string === "GRP_TXT") {
     for (let i = 0; i < json.path.length; i++) {
       // const byte = parseInt(json.path[i], 16);
-      console.log("FULL PATH IS",json.path,"FIRST IS ", json.path[0]);
+      console.log("FULL PATH IS",json.path,"FIRST IS ", json.path[0],"PATH IS ",path);
 
       const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
       // console.log("Contact is ",contact.advName);  
