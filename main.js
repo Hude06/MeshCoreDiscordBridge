@@ -41,7 +41,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     // const byte = parseInt(json.path[i], 16);
     console.log(json.path[i]);
     const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
-    console.log(contact);
+    console.log("Contact is ",contact);
   }
 });
 
