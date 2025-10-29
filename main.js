@@ -49,7 +49,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
       path.push(contact.advName || json.path[i]);
 
       if (i == json.path.length - 1) {
-        console.log("path is", path,json.payload.text);
+        console.log("path is", path,bytesToHex(new Uint8Array(json.payload)));
 
       }
     }
