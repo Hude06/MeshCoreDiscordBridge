@@ -27,39 +27,37 @@ let lastRssi = null;
 let lastSnr = null;
 
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
-  // console.log("LogRxData", event);
-  // console.log(bytesToHex(event.raw));
-
   const bytes = Buffer.from(bytesToHex(event.raw), "hex");
-
   const packet = Packet.fromBytes(bytes);
-  const json = (packet);
+  const json = packet;
 
   console.log("Parsed packet:", json);
 
-    // console.log(json.path,contactPrefix,hex,json)
-  const path = [];
-  // console.log(json.payload_type_string)
-  if (json.payload_type_string === "GRP_TXT" && Array.isArray(json.path)) {
-    const pathCopy = [...json.path];
+  if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
+    // Make a stable copy of the Uint8Array
+    const pathCopy = Array.from(json.path);
     const contactNames = [];
 
     for (let i = 0; i < pathCopy.length; i++) {
-      console.log("FULL PATH:", pathCopy, "FIRST IS:", pathCopy[0]);
+      const byte = pathCopy[i];
 
-      const contact = await connection.findContactByPublicKeyPrefix([
-        pathCopy[i]
-      ]);
+      // Lookup contact by prefix
+      const contact = await connection.findContactByPublicKeyPrefix([byte]);
 
       if (contact) {
         contactNames.push(contact.advName);
-        console.log("path so far", contactNames);
+      } else {
+        // Push placeholder for unknown contact
+        contactNames.push(`unknown:${byte.toString(16).padStart(2, '0')}`);
       }
+
+      console.log(`Step ${i}: byte=${byte} contact=${contact?.advName}`);
     }
 
     console.log("FINAL PATH:", contactNames);
   }
 });
+
 
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
