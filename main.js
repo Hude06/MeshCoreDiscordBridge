@@ -43,14 +43,14 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   if (json.payload_type_string === "GRP_TXT") {
     for (let i = 0; i < json.path.length; i++) {
       // const byte = parseInt(json.path[i], 16);
-      console.log(json.path[i]);
+      console.log("FULL PATH IS",json.path);
       const contact = await connection.findContactByPublicKeyPrefix([json.path[i]]);
       // console.log("Contact is ",contact.advName);
       if (contact) {
         path.push(contact.advName || json.path[i]);
         console.log("path so far", path);
       }
-      console.log(json.path.length, i);
+      console.log("LENGTH OF PATH",json.path.length,"INCERMENT WE ARE ON", i);
     }
   }
 });
