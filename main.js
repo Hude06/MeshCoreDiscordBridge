@@ -45,7 +45,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
       // const byte = parseInt(json.path[i], 16);
       console.log("FULL PATH IS",json.path,"FIRST IS ", json.path[0],"PATH IS ",path);
 
-      const contact = await connection.findContactByPublicKeyPrefix([bytesToHex(new uint8Array(json.path[i]))]);
+      const contact = await connection.findContactByPublicKeyPrefix([bytesToHex((json.path[i]))]);
       // console.log("Contact is ",contact.advName);  
       if (contact) {
         path.push(contact.advName);
