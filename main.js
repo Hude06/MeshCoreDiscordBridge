@@ -32,8 +32,8 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     const pathBytes = Array.from(json.path); // stable copy
     let prefix = [];
     for (let i = 0; i < pathBytes.length; i++) {
-      prefix.push(bytesToHex(Uint8Array.from(pathBytes[i]))); // accumulate full prefix up to this hop
-      console.log("Current PREFIX:", bytesToHex(Uint8Array.from(pathBytes[i])));
+      prefix.push(pathBytes[i]); // accumulate full prefix up to this hop
+      console.log("Current PREFIX:", bytesToHex(Uint8Array.from(prefix)));
     }
     console.log("FINAL PATH:", prefix);
     if (discordChannel) {
