@@ -68,6 +68,7 @@ async function onMeshMessagedReceived(message) {
   if (message.text.toLowerCase().includes("ping")) {
     await connection.sendChannelTextMessage(0, "pong");
   }
+  console.log(discordChannel)
   if (discordChannel) await discordChannel.send(message.text).catch(console.error);
 }
 
