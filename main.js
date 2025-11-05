@@ -14,7 +14,7 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-
+const discordChannel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
 console.log("Connecting to meshcore device...");
 connection.on("connected", async () => console.log("Connected to meshcore!"));
 
@@ -22,10 +22,6 @@ connection.on("connected", async () => console.log("Connected to meshcore!"));
 function bytesToHex(uint8Array) {
   return Array.from(uint8Array).map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
-
-let lastRssi = null;
-let lastSnr = null;
-
 connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const bytes = Buffer.from(bytesToHex(event.raw), "hex");
   const packet = Packet.fromBytes(bytes);
@@ -35,20 +31,13 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
 
   if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
     const pathBytes = Array.from(json.path); // stable copy
-    const contactNames = [];
-
-    // progressively build the prefix
     let prefix = [];
     for (let i = 0; i < pathBytes.length; i++) {
       prefix.push(pathBytes[i]); // accumulate full prefix up to this hop
-
-      const contact = await connection.findContactByPublicKeyPrefix(new Uint8Array(prefix));
-      contactNames.push(contact?.advName ?? `unknown:${pathBytes[i].toString(16).padStart(2,'0')}`);
-
-      console.log(`Step ${i}: prefix=[${prefix.map(b => b.toString(16).padStart(2,'0'))}] contact=${contact?.advName}`);
+      console.log("Current PREFIX:", bytesToHex(Uint8Array.from(prefix)));
     }
+    console.log("FINAL PATH:", prefix);
 
-    console.log("FINAL PATH:", contactNames);
   }
 });
 
@@ -60,7 +49,7 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
     for (const msg of waitingMessages) {
       // console.log("Received message: TEST", msg);
       console.log("Received message:", msg);
-      if (msg.channelMessage) await onChannelMessageReceived(msg.channelMessage);
+      if (msg.channelMessage) await onMeshMessagedReceived(msg.channelMessage);
     }
   } catch (e) {
     console.log(e);
@@ -69,7 +58,7 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
 
 // connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Advert received:", advert));
 
-async function onChannelMessageReceived(message) {
+async function onMeshMessagedReceived(message) {
   // console.log(`Received channel message: ${message.text}`);
   const meshMonday = bot.channels.cache.get(config.DISCORD_CHANNEL_ID_MESHMONDAY);
   if (message.text.includes("#meshmonday")) {
@@ -78,8 +67,7 @@ async function onChannelMessageReceived(message) {
   if (message.text.toLowerCase().includes("ping")) {
     await connection.sendChannelTextMessage(0, "pong");
   }
-  const channel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
-  if (channel) await channel.send(message.text).catch(console.error);
+  if (discordChannel) await discordChannel.send(message.text).catch(console.error);
 }
 
 // Replace slash commands with prefix commands
@@ -103,28 +91,29 @@ bot.on("messageCreate", async (message) => {
     if (command === 'advert') {
       try {
         await connection.sendFloodAdvert();
-        await message.channel.send("Sending Flood Advert!");
+        await discordChannel.send("Sending Flood Advert!");
       } catch (err) {
         console.error("Failed to send flood advert:", err);
-        await message.channel.send("Failed to send flood advert. Check logs.");
+        await discordChannel.send("Failed to send flood advert. Check logs.");
       }
       return;
-    }
-    if (command === 'send') {
+    } else if (command === 'send') {
       const text = args.join(' ');
       if (!text) {
-        await message.reply('Usage: `!send <message>`');
+        await message.reply('Send a message');
         return;
       }
       try {
-        const userId = message.author.username;
+        const member = message.member;
+        const userId = member?.nickname || message.author.username;
         await connection.sendChannelTextMessage(0, `${userId}: ${text}`);
-        await message.channel.send(`Sent: ${text}`);
+        await discordChannel.send(`Sent: ${text}`);
       } catch (err) {
         console.error("Failed to send channel text message:", err);
-        await message.channel.send("Failed to send message to meshcore. Check logs.");
+        await discordChannel.send("Failed to send message to meshcore. Check logs.");
       }
       return;
+
     }
   } catch (e) {
     console.error("Error handling messageCreate:", e);
