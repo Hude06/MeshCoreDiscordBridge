@@ -37,9 +37,9 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
     }
     console.log("FINAL PATH:", prefix);
     const waitingMessages = await connection.getWaitingMessages();
-
+    console.log("Waiting messages:", waitingMessages);
     if (discordChannel) {
-      await discordChannel.send(`RX LOG PATH: ${bytesToHex(Uint8Array.from(prefix))}` + await waitingMessages);
+      await discordChannel.send(`RX LOG PATH: ${bytesToHex(Uint8Array.from(prefix))}`);
     }
   }
 });
