@@ -14,7 +14,7 @@ const bot = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-const discordChannel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
+let discordChannel;
 console.log("Connecting to meshcore device...");
 connection.on("connected", async () => console.log("Connected to meshcore!"));
 
@@ -76,6 +76,8 @@ async function onMeshMessagedReceived(message) {
 bot.once("ready", () => {
   console.log(`Logged in as ${bot.user.tag}!`);
   console.log('Listening for commands: !advert, !send <message>');
+  discordChannel = bot.channels.cache.get(config.DISCORD_CHANNEL_ID);
+
 });
 
 bot.on("messageCreate", async (message) => {
