@@ -26,7 +26,8 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
   const bytes = Buffer.from(bytesToHex(event.raw), "hex");
   const packet = Packet.fromBytes(bytes);
   const json = packet;
-  console.log(bytesToHex(Uint8Array.from(json.payload)));
+  const payloadStr = Buffer.from(json.payload).toString("utf8");
+  console.log(payloadStr);
 
   if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
     const pathBytes = Array.from(json.path); // stable copy
