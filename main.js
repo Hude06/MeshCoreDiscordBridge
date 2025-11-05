@@ -47,6 +47,7 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
 connection.on(Constants.PushCodes.MsgWaiting, async () => {
   try {
     const waitingMessages = await connection.getWaitingMessages();
+    console.log(`You have ${waitingMessages.length} waiting messages.`);
     for (const msg of waitingMessages) {
       // console.log("Received message: TEST", msg);
       console.log("Received message:", msg);
