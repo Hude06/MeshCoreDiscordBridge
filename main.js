@@ -36,8 +36,10 @@ connection.on(Constants.PushCodes.LogRxData, async (event) => {
       console.log("Current PREFIX:", bytesToHex(Uint8Array.from(prefix)));
     }
     console.log("FINAL PATH:", prefix);
+    const waitingMessages = await connection.getWaitingMessages();
+
     if (discordChannel) {
-      await discordChannel.send(`RX LOG PATH: ${bytesToHex(Uint8Array.from(prefix))}\nMessage: ${json.text}`).catch(console.error);
+      await discordChannel.send(`RX LOG PATH: ${bytesToHex(Uint8Array.from(prefix))}` + await waitingMessages);
     }
   }
 });
