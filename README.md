@@ -1,5 +1,5 @@
 # Meshcore Bridge to Discord
-
+### Open terminal and git clone this URL. Only clone the DEV branch if you know what you are doing the code might not be production ready
 ## Meshcore Setup
 Flash your Meshcore node with the latest client firmware over USB.  
 Update `config.json` and set the correct serial port for your node.
