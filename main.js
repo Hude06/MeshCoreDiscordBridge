@@ -19,31 +19,31 @@ console.log("Connecting to meshcore device...");
 connection.on("connected", async () => console.log("Connected to meshcore!"));
 
 // helper: bytes to hex
-function bytesToHex(uint8Array) {
-  return Array.from(uint8Array).map(byte => byte.toString(16).padStart(2, '0')).join('');
-}
-connection.on(Constants.PushCodes.LogRxData, async (event) => {
-  const bytes = Buffer.from(bytesToHex(event.raw), "hex");
-  const packet = Packet.fromBytes(bytes);
-  const json = packet;
-  const payloadStr = Buffer.from(json.payload).toString("utf8");
-  console.log(payloadStr);
+// function bytesToHex(uint8Array) {
+//   return Array.from(uint8Array).map(byte => byte.toString(16).padStart(2, '0')).join('');
+// }
+// connection.on(Constants.PushCodes.LogRxData, async (event) => {
+//   const bytes = Buffer.from(bytesToHex(event.raw), "hex");
+//   const packet = Packet.fromBytes(bytes);
+//   const json = packet;
+//   const payloadStr = Buffer.from(json.payload).toString("utf8");
+//   console.log(payloadStr);
 
-  if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
-    const pathBytes = Array.from(json.path); // stable copy
-    let prefix = [];
-    for (let i = 0; i < pathBytes.length; i++) {
-      prefix.push(pathBytes[i]); // accumulate full prefix up to this hop
-      console.log("Current PREFIX:", bytesToHex(Uint8Array.from(prefix)));
-    }
-    console.log("FINAL PATH:", prefix);
-    const waitingMessages = await connection.getWaitingMessages();
-    console.log("Waiting messages:", waitingMessages);
-    if (discordChannel) {
-      await discordChannel.send(`RX LOG PATH: ${bytesToHex(Uint8Array.from(prefix))}`);
-    }
-  }
-});
+//   if (json.payload_type_string === "GRP_TXT" && json.path && json.path.length) {
+//     const pathBytes = Array.from(json.path); // stable copy
+//     let prefix = [];
+//     for (let i = 0; i < pathBytes.length; i++) {
+//       prefix.push(pathBytes[i]); // accumulate full prefix up to this hop
+//       console.log("Current PREFIX:", bytesToHex(Uint8Array.from(prefix)));
+//     }
+//     console.log("FINAL PATH:", prefix);
+//     const waitingMessages = await connection.getWaitingMessages();
+//     console.log("Waiting messages:", waitingMessages);
+//     if (discordChannel) {
+//       await discordChannel.send(`RX LOG PATH: ${bytesToHex(Uint8Array.from(prefix))}`);
+//     }
+//   }
+// });
 
 
 
@@ -61,7 +61,6 @@ connection.on(Constants.PushCodes.MsgWaiting, async () => {
   }
 });
 
-// connection.on(Constants.PushCodes.AdvertReceived, (advert) => console.log("Advert received:", advert));
 
 async function onMeshMessagedReceived(message) {
   // console.log(`Received channel message: ${message.text}`);
