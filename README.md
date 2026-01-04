@@ -23,3 +23,36 @@ Update `config.json` and set the correct serial port for your node.
 ### Mesh → Discord
 - All messages received from the mesh are forwarded to the configured Discord channel.
 - If a mesh message contains **"ping"**, the bot replies with **"ping"** over the mesh.
+
+
+
+### Example config.json
+
+``` js {
+  // Prefix or identifier your bot listens for (e.g. "!" for !command)
+  "identifier": "!",
+
+  // Discord bot token
+  // NEVER commit a real token. Rotate immediately if you ever leak one.
+  "DISCORD_TOKEN": "YOUR_BOT_TOKEN_HERE",
+
+  // Discord channel ID where the bot sends normal messages
+  // Enable Developer Mode in Discord → right-click channel → Copy ID
+  "DISCORD_CHANNEL_ID": "123456789012345678",
+
+  // Separate channel ID for Mesh Monday (or any special-purpose channel)
+  // Optional, but useful if you route messages differently
+  "DISCORD_CHANNEL_ID_MESHMONDAY": "234567890123456789",
+
+  // Serial port used to communicate with your device
+  // Linux: /dev/ttyUSB0 or /dev/ttyACM0
+  // macOS: /dev/tty.usbserial-XXXX
+  // Windows: COM3, COM4, etc.
+  "SERIAL_PORT": "/dev/ttyUSB0",
+
+  // Discord server (guild) ID
+  // Required for guild-specific slash commands
+  // Commands register instantly but ONLY for this server
+  "GUILD_ID": "345678901234567890"
+}
+````
